@@ -5,6 +5,7 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { Footer } from "@/components/Footer";
 import { Testimonials } from "@/components/Testimonials";
 import { PricingSection } from "@/components/pricing/PricingSection";
+
 export default function Home() {
   return (
     <div className="min-h-screen">
