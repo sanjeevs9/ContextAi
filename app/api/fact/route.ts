@@ -61,7 +61,28 @@ async function checkIfOpinion(text: string) {
     messages: [
       {
         role: "system",
-        content: "Analyze if the given text is an opinion or a factual claim. Respond with a JSON object containing 'isOpinion' (boolean) and 'explanation' (string)."
+        content: `You are a fact-checking assistant that MUST return JSON in this exact format:
+        {
+          "isOpinion": boolean,
+          "factualScore": number,  // 0-100
+          "references": string[],
+          "explanation": string    // use this field name only
+        }
+
+        Example correct response:
+        {
+          "isOpinion": false,
+          "factualScore": 100,
+          "references": ["https://example.com/source"],
+          "explanation": "This is a factual statement because..."
+        }
+
+        CRITICAL REQUIREMENTS:
+        - Field names must be exactly as shown above
+        - DO NOT use "factual_score" or "detailed_explanation"
+        - Use "factualScore" and "explanation" exactly as written
+        - No additional fields allowed
+        - No variant field names allowed`
       },
       {
         role: "user",
