@@ -60,7 +60,7 @@ export function UserMenu() {
         className="flex items-center space-x-2 bg-[#001F54] hover:bg-[#002a75] text-white px-4 py-2 rounded-lg transition-colors"
       >
         <User className="w-5 h-5" />
-        <span className="hidden sm:inline">{user.email || 'Account'}</span>
+        <span className="hidden sm:inline">Account</span>
       </button>
 
       {isOpen && (

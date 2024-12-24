@@ -17,32 +17,65 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Check subscription status and daily limit
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('subscription_status, daily_check_limit')
+      .eq('email', session.user.email)
+      .single();
+
+    if (userError) {
+      return NextResponse.json({ error: 'Error fetching user data', buy: false, login: false }, { status: 500 });
+    }
+   
+    const isPremium = userData.subscription_status === 'premium';
+
+    // If free user and daily limit is 0, stop the process
+    if (!isPremium && userData.daily_check_limit <= 0) {
+      return NextResponse.json({ 
+        error: 'Daily limit reached. Please upgrade to premium for unlimited checks.' ,
+        buy: false,
+        login: true
+      }, { status: 403 });
+    }
+
     const body: FactCheckRequest = await request.json();
     const { text, domain } = body;
 
-    // 1. Check if it's an opinion
+    // Perform all fact checking operations
     const opinionCheck = await checkIfOpinion(text);
     
+    let response: FactCheckResponse;
+    
     if (opinionCheck.isOpinion) {
-      return NextResponse.json({
+      response = {
         isOpinion: true,
         factualScore: 0,
         explanation: opinionCheck.explanation,
-      });
+      };
+    } else {
+      const factCheck = await performFactCheck(text);
+      const sourceCredibility = domain ? 
+        await getSourceCredibility(domain) : undefined;
+
+      response = {
+        ...factCheck,
+        isOpinion: false,
+        sourceCredibility,
+      };
     }
 
-    // 2. Perform fact check
-    const factCheck = await performFactCheck(text);
+    // Decrease daily limit for free users after successful fact check
+    if (!isPremium) {
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ daily_check_limit: userData.daily_check_limit - 1 })
+        .eq('email', session.user.email);
 
-    // 3. Get source credibility if domain is provided
-    const sourceCredibility = domain ? 
-      await getSourceCredibility(domain) : undefined;
-
-    const response: FactCheckResponse = {
-      ...factCheck,
-      isOpinion: false,
-      sourceCredibility,
-    };
+      if (updateError) {
+        console.error('Error updating daily limit:', updateError);
+      }
+    }
 
     return NextResponse.json(response);
   } catch (error) {
