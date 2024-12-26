@@ -9,13 +9,11 @@ import { PricingSection } from "@/components/pricing/PricingSection";
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <Header />
       <Hero />
       <Features />
       <HowItWorks />
       <PricingSection />
       <Testimonials />
-      <Footer />
     </div>
   );
 }

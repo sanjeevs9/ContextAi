@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
     return new NextResponse(null, {
       headers: {
         'Access-Control-Allow-Origin': 'http://localhost:5173',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Allow-Credentials': 'true',
       },

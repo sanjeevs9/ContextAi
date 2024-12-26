@@ -14,13 +14,13 @@ export async function POST(request: Request) {
     // Verify authentication
     const session = await validateAuth();
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized',login:false }, { status: 401 });
     }
 
     // Check subscription status and daily limit
     const { data: userData, error: userError } = await supabase
       .from('users')
-      .select('subscription_status, daily_check_limit')
+      .select('subscription_status, daily_check_limit, user_id')
       .eq('email', session.user.email)
       .single();
 
@@ -46,6 +46,8 @@ export async function POST(request: Request) {
     const opinionCheck = await checkIfOpinion(text);
     
     let response: FactCheckResponse;
+    let confidenceScore = 0;
+    let resultType='false';
     
     if (opinionCheck.isOpinion) {
       response = {
@@ -53,8 +55,11 @@ export async function POST(request: Request) {
         factualScore: 0,
         explanation: opinionCheck.explanation,
       };
+      confidenceScore = 0;
+      resultType = 'false';
     } else {
       const factCheck = await performFactCheck(text);
+  
       const sourceCredibility = domain ? 
         await getSourceCredibility(domain) : undefined;
 
@@ -63,7 +68,30 @@ export async function POST(request: Request) {
         isOpinion: false,
         sourceCredibility,
       };
+      confidenceScore = factCheck.factual_score;
+      resultType = 'true';
     }
+    
+    const explanation = response.explanation || response.detailed_explanation;
+    console.log(userData);
+    // Update the cache with results
+    const { data: cacheData, error: cacheError } = await supabase
+    .from('fact_check_cache')
+    .insert({
+      user_id: userData.user_id,
+      query_text: text,
+      confidence_score: confidenceScore, // Will update this after fact check
+      result_type: resultType,      // Will update this after fact check
+      explanation: explanation,      // Will update this after fact check
+      reference_sources: response.references || [], // Will update this after fact check
+    })
+    .select()
+    .single();
+
+ 
+  if (cacheError) {
+    console.error('Error storing in cache:', cacheError);
+  }
 
     // Decrease daily limit for free users after successful fact check
     if (!isPremium) {
@@ -76,6 +104,7 @@ export async function POST(request: Request) {
         console.error('Error updating daily limit:', updateError);
       }
     }
+    response.cache_id = cacheData?.cache_id;
 
     return NextResponse.json(response);
   } catch (error) {
