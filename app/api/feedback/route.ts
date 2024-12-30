@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Error fetching user data', buy: false, login: false }, { status: 500 });
     }
    console.log({cache_id});
-    const { data, error } = await supabase
+    const {  error } = await supabase
     .from('feedback')
     .upsert({
       user_id: userData.user_id,
@@ -47,6 +47,6 @@ export async function POST(request: Request) {
     })
     
   } catch (error) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: error }, { status: 401 });
   }
 }

@@ -50,7 +50,7 @@ export default function LoginPage() {
               </Link>
             </div>
             <div className="text-gray-300">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/signup" className="text-blue-300 hover:text-blue-200 transition-colors">
                 Sign up
               </Link>

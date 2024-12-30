@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 // import { OrderTable, db } from "@/lib/drizzleOrm";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase";
-import { on } from "events";
+
 const supabase = createClient();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
   switch (event.type) {
     case "checkout.session.async_payment_failed":
-      const checkoutSessionAsyncPaymentFailed = event.data.object;
+      // const checkoutSessionAsyncPaymentFailed = event.data.object;
     //   const {data,error}=await supabase.from('subscriptions').insert({
     //     user_id:checkoutSessionAsyncPaymentFailed.metadata.userId,
     //     email:checkoutSessionAsyncPaymentFailed.metadata.email,
@@ -41,23 +41,32 @@ export async function POST(request: NextRequest) {
       break;
     case "checkout.session.async_payment_succeeded":
       const checkoutSessionAsyncPaymentSucceeded = event.data.object;
+      console.log({checkoutSessionAsyncPaymentSucceeded});
       console.log("checkoutSessionAsyncPaymentSucceeded")
       break;
 
      // this is for the success page
     case "checkout.session.completed":
 
-      const checkoutSessionCompleted: any =  event.data.object;
-      console.log({checkoutSessionCompleted});
-        console.log(checkoutSessionCompleted.metadata.userId)
-        console.log(checkoutSessionCompleted.id)
+      const checkoutSessionCompleted =  event.data.object;
+
+      if(checkoutSessionCompleted.metadata==null || checkoutSessionCompleted.metadata.userId==null){
+
+        return new Response(`Webhook Error: ${"metadata not found"}`, {
+          status: 400,
+        });
+      }
 
       const {data:subscriptionData,error:subscriptionError}=await supabase.from('subscriptions').update({
         payment_status:"completed",
         stripe_transaction_id:checkoutSessionCompleted.id,
       }).eq('user_id',checkoutSessionCompleted.metadata.userId).select("end_date")
 
-      console.log({subscriptionData});
+      if(subscriptionError){  
+        return new Response(`Webhook Error: ${subscriptionError}`, {
+          status: 400,
+        });
+      }
 
       const {data:userData,error:userError}=await supabase.from('users').update({
         subscription_status:"premium",

@@ -1,7 +1,6 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+
 
 export async function validateAuth() {
   console.log("validating auth");
@@ -16,6 +15,9 @@ export async function validateAuth() {
 
   const {data:userData,error:userError}=await supabase.from('users').select('user_id,email').eq('email',session.user.email).single();
   // console.log({userData});
+  if(userError){
+    throw new Error('Error fetching user data');
+  }
 
   return {userData,session};
 } 

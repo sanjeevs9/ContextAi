@@ -1,6 +1,5 @@
 import { SubscriptionCard } from "./SubscriptionCard";
 import { SearchHistoryCard } from "./SearchHistoryCard";
-import { UsageStats } from "./UsageStats";
 import type { SearchResult, SubscriptionInfo } from "@/types/search";
 
 interface DashboardProps {

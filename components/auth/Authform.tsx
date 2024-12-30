@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from 'react'
-import type { FormEvent } from 'react'
 
 interface AuthFormProps {
   onSubmit: (email: string, password: string) => Promise<void>

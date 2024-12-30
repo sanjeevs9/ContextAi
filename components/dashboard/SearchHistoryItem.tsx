@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { CheckCircle, AlertCircle, Link } from "lucide-react";
 import type { SearchResult } from "@/types/search";
 
