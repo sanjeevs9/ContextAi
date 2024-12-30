@@ -35,12 +35,12 @@ const router = useRouter();
 
 async function handlePricingAction() {
   try {
-    if (user?.subscription_status === "premium") {
-      router.push("/dashboard");
+    if (!user) {
+      router.push("/login");
       return;
     }
-
-    if (user?.subscription_status !== "free") {
+    
+    if (user.subscription_status === "free") {
       await handleCheckout({
         price: Number(price) * 100,
         model: model
@@ -48,9 +48,9 @@ async function handlePricingAction() {
     } else {
       router.push("/dashboard");
     }
+    
   } catch (error) {
     console.error("Error processing pricing action:", error);
-    // Add appropriate error handling/notification here
   }
 }
 

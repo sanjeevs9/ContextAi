@@ -15,8 +15,10 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' https://js.stripe.com",
+              "connect-src 'self' https://api.stripe.com https://r.stripe.com",
+              "frame-src 'self' https://js.stripe.com https://hooks.stripe.com",
+              "img-src 'self' https://*.stripe.com",
               "style-src 'self' 'unsafe-inline'",
-              // Add other directives as needed
             ].join('; ')
           }
         ]
