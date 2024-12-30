@@ -53,9 +53,9 @@ export function useSubscription() {
                 .eq('user_id',userData.user_id)
                 .single();
 
-
-                if(subscriptionError) throw new Error(subscriptionError.message);
-                setSubscription(subscriptionData);
+                if(subscriptionData){
+                    setSubscription(subscriptionData);
+                }
                 
             } catch (error) {
                 console.error(error);

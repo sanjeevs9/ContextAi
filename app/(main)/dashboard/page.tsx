@@ -15,8 +15,11 @@ export default function DashboardPage(){
     useEffect(() => {
         if (!user) {
             router.push('/login');
+        }else if(!subscription){
+            router.push('/');
         }
-    }, [user, router]);
+       
+    }, [user, router, subscription]);
 
     if (loading) {
         return <div><Loading/></div>;
