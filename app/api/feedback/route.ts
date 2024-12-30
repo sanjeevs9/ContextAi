@@ -7,7 +7,7 @@ const supabase=createClient();
 
 export async function POST(request: Request) {
   try {
-    const session = await validateAuth();
+    const {session} = await validateAuth();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized', login: false }, { status: 401 });
     }

@@ -17,18 +17,18 @@ export function Navigation() {
       {navItems.map((item) => (
         <button
           key={item.label}
-          onClick={() =>{
-
-            if(path==='/dashboard'){
-              router.push('/');
-              scrollToSection(item.href);
-            }else if(item.href==='dashboard'){
+          onClick={() => {
+            if (path === '/dashboard') {
+              router.push('/')
+                setTimeout(() => {
+                  scrollToSection(item.href);
+                }, 100);
+              
+            } else if (item.href === 'dashboard') {
               router.push('/dashboard');
-            }
-            else{
+            } else {
               scrollToSection(item.href);
             }
-
           }}
           className="text-gray-300 hover:text-[#00FFC8] transition-colors"
         >

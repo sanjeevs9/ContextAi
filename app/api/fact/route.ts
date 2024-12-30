@@ -16,12 +16,12 @@ export async function POST(request: Request) {
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized',login:false }, { status: 401 });
     }
-
+    console.log(session.userData?.email)
     // Check subscription status and daily limit
     const { data: userData, error: userError } = await supabase
       .from('users')
       .select('subscription_status, daily_check_limit, user_id')
-      .eq('email', session.user.email)
+      .eq('email', session.userData?.email)
       .single();
 
     if (userError) {
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       const { error: updateError } = await supabase
         .from('users')
         .update({ daily_check_limit: userData.daily_check_limit - 1 })
-        .eq('email', session.user.email);
+        .eq('email', session.userData?.email);
 
       if (updateError) {
         console.error('Error updating daily limit:', updateError);

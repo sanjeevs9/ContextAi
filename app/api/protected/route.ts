@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
-  const session = await validateAuth();
+  const {session} = await validateAuth();
 
 
   console.log({session})

@@ -44,18 +44,29 @@ export function SearchHistoryItem({ search }: SearchHistoryItemProps) {
           <div className="flex-1">
             <p className="text-sm font-medium text-gray-300 mb-1">References:</p>
             <ul className="space-y-1">
-              {search.reference_sources.map((ref, idx) => (
-                <li key={idx} className="text-sm text-gray-400 truncate">
-                  <a 
-                    href={ref} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="hover:text-[#00FF9D] transition-colors"
-                  >
-                    {ref}
-                  </a>
-                </li>
-              ))}
+              {search.reference_sources.map((ref, idx) => {
+                console.log(ref);
+                // Extract URL from the reference if it contains one
+                const urlMatch = ref.match(/(https?:\/\/[^\s]+)/);
+                const url = urlMatch ? urlMatch[0] : null;
+                
+                return (
+                  <li key={idx} className="text-sm text-gray-400 truncate">
+                    {url ? (
+                      <a 
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-[#00FF9D] transition-colors"
+                      >
+                        {ref}
+                      </a>
+                    ) : (
+                      <span>{ref}</span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>

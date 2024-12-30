@@ -1,6 +1,7 @@
 "use client"
 import { Check } from 'lucide-react';
 import { formatPrice } from '../../utils/formatting';
+import { handleCheckout } from '../stripe/Checkout';
 
 interface PricingFeature {
   text: string;
@@ -14,6 +15,7 @@ interface PricingTierProps {
   features: PricingFeature[];
   highlighted?: boolean;
   buttonText: string;
+  model:string;
 }
 
 export function PricingTier({
@@ -22,7 +24,8 @@ export function PricingTier({
   description,
   features,
   highlighted = false,
-  buttonText
+  buttonText,
+  model
 }: PricingTierProps) {
   return (
     <div className={`relative rounded-2xl ${
@@ -82,7 +85,15 @@ export function PricingTier({
         ))}
       </ul>
 
-      <button className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+      <button onClick={
+        ()=>{
+          if(name!="Free"){
+            handleCheckout({price:Number(price)*100,model:model})
+          }else{
+            window.location.href="/dashboard"
+          }
+        }
+      } className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
         highlighted
           ? 'bg-[#00FFC8] text-[#001F54] hover:bg-[#00FFC8]/90'
           : 'bg-[#001F54] text-white hover:bg-[#001F54]/90'

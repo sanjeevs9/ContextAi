@@ -11,16 +11,20 @@
   "dependencies": {
     "@radix-ui/react-progress": "^1.1.1",
     "@radix-ui/react-toast": "^1.2.4",
+    "@stripe/react-stripe-js": "^3.1.1",
+    "@stripe/stripe-js": "^5.4.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.47.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
     "lucide-react": "^0.469.0",
+    "micro": "^10.0.1",
     "next": "14.2.21",
     "openai": "^4.77.0",
     "react": "^18",
     "react-dom": "^18",
+    "stripe": "^17.5.0",
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {

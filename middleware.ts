@@ -30,7 +30,7 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getSession();
 
   // Define public routes that don't require authentication
-  const publicRoutes = ['/', '/login', '/signup', '/forgot-password'];
+  const publicRoutes = ['/', '/login', '/signup', '/forgot-password','/api/webhook'];
   
   // If the user is not logged in and trying to access a protected route
   if (!session && !publicRoutes.includes(path)) {

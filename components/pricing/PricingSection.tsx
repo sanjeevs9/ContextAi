@@ -3,11 +3,12 @@ import { PricingTier } from './PricingTier';
 const pricingTiers = [
   {
     name: 'Free',
+    model:"free",
     price: null,
     description: 'Perfect for getting started with fact-checking',
     features: [
       { text: 'Basic fact-checking', included: true },
-      { text: '100 checks per month', included: true },
+      { text: '10 checks per day', included: true },
       { text: 'Access to public sources', included: true },
       { text: 'Browser extension', included: true },
       { text: 'Advanced AI analysis', included: false },
@@ -17,6 +18,7 @@ const pricingTiers = [
   },
   {
     name: 'Pro',
+    model:"premium_monthly",
     price: 19.90,
     description: 'Ideal for professionals and content creators',
     features: [
@@ -27,11 +29,12 @@ const pricingTiers = [
       { text: 'Advanced AI analysis', included: true },
       { text: 'Priority support', included: true },
     ],
-    buttonText: 'Start Pro Trial',
+    buttonText: 'Start Monthly Subscription',
     highlighted: true,
   },
   {
     name: 'Team',
+    model:"premium_annual",
     price: 49.90,
     description: 'Perfect for teams and organizations',
     features: [
@@ -42,7 +45,7 @@ const pricingTiers = [
       { text: 'Custom integrations', included: true },
       { text: 'Dedicated support', included: true },
     ],
-    buttonText: 'Contact Sales',
+    buttonText: 'Start Annual Subscription',
   },
 ];
 
@@ -62,6 +65,7 @@ export function PricingSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {pricingTiers.map((tier, index) => (
             <PricingTier
+              model={tier.model}
               key={index}
               name={tier.name}
               price={tier.price}
