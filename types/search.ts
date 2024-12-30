@@ -11,10 +11,7 @@ export interface SearchResult {
   }
   
   export interface SubscriptionInfo {
-    isActive: boolean;
-    daysRemaining: number;
-    plan: 'free' | 'pro' | 'team';
-    expiryDate: string;
-    usageLimit: number;
-    usageCount: number;
+    plan_type:string;
+    start_date:Date;
+    end_date:Date;
   }

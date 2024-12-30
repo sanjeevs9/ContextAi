@@ -7,9 +7,20 @@ interface SubscriptionCardProps {
   subscription: SubscriptionInfo;
 }
 
-export function SubscriptionCard({ subscription }: SubscriptionCardProps) {
-  const progressValue = (subscription.daysRemaining / 30) * 100;
 
+
+// export const sampleSubscription: SubscriptionInfo = {
+//   plan_type: 'pro',
+//   start_data: new Date(),
+//   end_data: new Date(new Date().setDate(new Date().getDate() + 30)),
+// };
+
+export function SubscriptionCard({ subscription }: SubscriptionCardProps) {
+  console.log({subscription});
+  const endDate = new Date(subscription.end_date);
+  const daysRemaining = Math.floor((endDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+  const progressValue = (daysRemaining / 30) * 100;
+  
   return (
     <Card className="col-span-4 bg-[#001233] border-[#001845]">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -20,23 +31,23 @@ export function SubscriptionCard({ subscription }: SubscriptionCardProps) {
         <div className="flex flex-col space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-white">
-              {subscription.plan.charAt(0).toUpperCase() + subscription.plan.slice(1)} Plan
+              {subscription.plan_type==="premium_annual"?"Premium Annual":"Premium Monthly"}
             </p>
             <span className={`rounded-full px-2 py-1 text-xs ${
-              subscription.isActive 
+              true 
                 ? 'bg-[#00FF9D]/10 text-[#00FF9D]' 
                 : 'bg-red-500/10 text-red-400'
             }`}>
-              {subscription.isActive ? 'Active' : 'Inactive'}
+              {true ? 'Active' : 'Inactive'}
             </span>
           </div>
           
-          {subscription.isActive && (
+          {/* {subscription.isActive && ( */}
             <>
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-300">Days Remaining</span>
-                  <span className="font-semibold text-white">{subscription.daysRemaining} days</span>
+                  <span className="font-semibold text-white">{daysRemaining} days</span>
                 </div>
                 <Progress 
                   value={progressValue} 
@@ -47,10 +58,10 @@ export function SubscriptionCard({ subscription }: SubscriptionCardProps) {
               
               <div className="flex items-center space-x-2 text-sm text-gray-400">
                 <Calendar className="h-4 w-4" />
-                <span>Expires on {new Date(subscription.expiryDate).toLocaleDateString()}</span>
+                <span>Expires on {new Date(subscription.end_date).toLocaleDateString()}</span>
               </div>
             </>
-          )}
+          {/* )} */}
         </div>
       </CardContent>
     </Card>

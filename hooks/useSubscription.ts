@@ -1,6 +1,7 @@
 "use client"
 import { useAuth } from "@/context/AuthContext";
-import { SearchResult } from "@/types/search";
+import { SearchResult, SubscriptionInfo } from "@/types/search";
+import { CounterClockwiseClockIcon } from "@radix-ui/react-icons";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useState, useEffect } from "react";   
 
@@ -16,6 +17,7 @@ export function useSubscription() {
     const [history, setHistory] = useState<SearchResult[]>([]);
     const [user, setUser] = useState<any|null>(null);
     const [loading, setLoading] = useState(true);
+    const [subscription, setSubscription] = useState<SubscriptionInfo|null>(null);
 
     useEffect(() => {
         if (!session) return;
@@ -27,7 +29,7 @@ export function useSubscription() {
                 // Fetch user data
                 const { data: userData, error: userError } = await supabase
                     .from('users')
-                    .select('subscription_status, daily_check_limit, user_id, subscription_expiry')
+                    .select('*')
                     .eq('email', session.email)
                     .single();
                     
@@ -44,6 +46,17 @@ export function useSubscription() {
 
                 if (searchError) throw new Error(searchError.message);
                 setHistory(searchData);
+                
+                const {data:subscriptionData,error:subscriptionError}=await supabase
+                .from('subscriptions')
+                .select('*')
+                .eq('user_id',userData.user_id)
+                .single();
+
+
+                if(subscriptionError) throw new Error(subscriptionError.message);
+                setSubscription(subscriptionData);
+                
             } catch (error) {
                 console.error(error);
             } finally {
@@ -54,5 +67,5 @@ export function useSubscription() {
         fetchUserAndHistory();
     }, [session]);
 
-    return { history, user, loading };
+    return { history, user, loading, subscription };
 }

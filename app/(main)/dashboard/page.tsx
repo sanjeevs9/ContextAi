@@ -10,7 +10,7 @@ import Loading from "./loading";
 export default function DashboardPage(){
     const router = useRouter();
     const { user }= useAuth();
-    const { history, loading } = useSubscription();
+    const { history, loading , subscription } = useSubscription();
 
     useEffect(() => {
         if (!user) {
@@ -21,8 +21,11 @@ export default function DashboardPage(){
     if (loading) {
         return <div><Loading/></div>;
     }
+    
+    
 
     return <div className="">
-        <Dashboard subscription={sampleSubscription} searchHistory={history} />
+        {/* @ts-ignore */}
+        <Dashboard subscription={subscription} searchHistory={history} />
     </div>
 }
