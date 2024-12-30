@@ -12,13 +12,17 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "script-src 'self';",
-          },
-        ],
-      },
-    ];
-  },
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' https://js.stripe.com",
+              "style-src 'self' 'unsafe-inline'",
+              // Add other directives as needed
+            ].join('; ')
+          }
+        ]
+      }
+    ]
+  }
+};
 
-}
-
-module.exports = nextConfig 
+module.exports = nextConfig; 
