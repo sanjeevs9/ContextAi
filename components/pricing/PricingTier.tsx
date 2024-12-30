@@ -3,7 +3,7 @@ import { Check } from 'lucide-react';
 import { formatPrice } from '../../utils/formatting';
 import { handleCheckout } from '../stripe/Checkout';
 import { useSubscription } from '@/hooks/useSubscription';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 interface PricingFeature {
   text: string;
@@ -32,25 +32,21 @@ export function PricingTier({
 const {user} = useSubscription();
 const router = useRouter();
 
-const handleNavigation = (path: string) => {
-  // Use router push instead of direct window.location
-  router.push(path);
-};
 
 async function handlePricingAction() {
   try {
     if (user?.subscription_status === "premium") {
-      handleNavigation("/dashboard");
+      router.push("/dashboard");
       return;
     }
 
-    if (name !== "Free") {
+    if (user?.subscription_status !== "free") {
       await handleCheckout({
         price: Number(price) * 100,
         model: model
       });
     } else {
-      handleNavigation("/dashboard");
+      router.push("/dashboard");
     }
   } catch (error) {
     console.error("Error processing pricing action:", error);
