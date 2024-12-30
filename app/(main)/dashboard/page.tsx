@@ -25,7 +25,7 @@ export default function DashboardPage(){
     
 
     return <div className="">
-        {/* @ts-ignore */}
-        <Dashboard subscription={subscription} searchHistory={history} />
+        
+        <Dashboard subscription={subscription || sampleSubscription} searchHistory={history} />
     </div>
 }
