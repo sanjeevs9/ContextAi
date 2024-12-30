@@ -2,6 +2,7 @@
 import { Check } from 'lucide-react';
 import { formatPrice } from '../../utils/formatting';
 import { handleCheckout } from '../stripe/Checkout';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface PricingFeature {
   text: string;
@@ -27,6 +28,9 @@ export function PricingTier({
   buttonText,
   model
 }: PricingTierProps) {
+const {user}=useSubscription();
+
+
   return (
     <div className={`relative rounded-2xl ${
       highlighted 
@@ -87,13 +91,16 @@ export function PricingTier({
 
       <button onClick={
         ()=>{
+          if(user.subscription_status==="premium"){
+            window.location.href="/dashboard"
+          }else{
           if(name!="Free"){
             handleCheckout({price:Number(price)*100,model:model})
           }else{
             window.location.href="/dashboard"
           }
         }
-      } className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+      } }className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
         highlighted
           ? 'bg-[#00FFC8] text-[#001F54] hover:bg-[#00FFC8]/90'
           : 'bg-[#001F54] text-white hover:bg-[#001F54]/90'
