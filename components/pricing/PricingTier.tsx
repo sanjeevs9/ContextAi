@@ -30,6 +30,18 @@ export function PricingTier({
 }: PricingTierProps) {
 const {user}=useSubscription();
 
+function fn(){
+  if(user.subscription_status==="premium"){
+    window.location.href="/dashboard"
+  }else{
+  if(name!="Free"){
+    handleCheckout({price:Number(price)*100,model:model})
+  }else{
+    window.location.href="/dashboard"
+  }
+}
+}
+
 
   return (
     <div className={`relative rounded-2xl ${
@@ -89,18 +101,7 @@ const {user}=useSubscription();
         ))}
       </ul>
 
-      <button onClick={
-        ()=>{
-          if(user.subscription_status==="premium"){
-            window.location.href="/dashboard"
-          }else{
-          if(name!="Free"){
-            handleCheckout({price:Number(price)*100,model:model})
-          }else{
-            window.location.href="/dashboard"
-          }
-        }
-      } }className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+      <button onClick={fn} className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
         highlighted
           ? 'bg-[#00FFC8] text-[#001F54] hover:bg-[#00FFC8]/90'
           : 'bg-[#001F54] text-white hover:bg-[#001F54]/90'
