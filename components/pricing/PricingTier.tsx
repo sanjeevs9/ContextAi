@@ -3,6 +3,7 @@ import { Check } from 'lucide-react';
 import { formatPrice } from '../../utils/formatting';
 import { handleCheckout } from '../stripe/Checkout';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useRouter } from 'next/router';
 
 interface PricingFeature {
   text: string;
@@ -28,20 +29,34 @@ export function PricingTier({
   buttonText,
   model
 }: PricingTierProps) {
-const {user}=useSubscription();
+const {user} = useSubscription();
+const router = useRouter();
 
-function fn(){
-  if(user.subscription_status==="premium"){
-    window.location.href="/dashboard"
-  }else{
-  if(name!="Free"){
-    handleCheckout({price:Number(price)*100,model:model})
-  }else{
-    window.location.href="/dashboard"
+const handleNavigation = (path: string) => {
+  // Use router push instead of direct window.location
+  router.push(path);
+};
+
+async function handlePricingAction() {
+  try {
+    if (user?.subscription_status === "premium") {
+      handleNavigation("/dashboard");
+      return;
+    }
+
+    if (name !== "Free") {
+      await handleCheckout({
+        price: Number(price) * 100,
+        model: model
+      });
+    } else {
+      handleNavigation("/dashboard");
+    }
+  } catch (error) {
+    console.error("Error processing pricing action:", error);
+    // Add appropriate error handling/notification here
   }
 }
-}
-
 
   return (
     <div className={`relative rounded-2xl ${
@@ -101,11 +116,14 @@ function fn(){
         ))}
       </ul>
 
-      <button onClick={fn} className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
-        highlighted
-          ? 'bg-[#00FFC8] text-[#001F54] hover:bg-[#00FFC8]/90'
-          : 'bg-[#001F54] text-white hover:bg-[#001F54]/90'
-      }`}>
+      <button 
+        onClick={handlePricingAction} 
+        className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+          highlighted
+            ? 'bg-[#00FFC8] text-[#001F54] hover:bg-[#00FFC8]/90'
+            : 'bg-[#001F54] text-white hover:bg-[#001F54]/90'
+        }`}
+      >
         {buttonText}
       </button>
     </div>
