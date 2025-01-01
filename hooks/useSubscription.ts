@@ -27,7 +27,7 @@ export function useSubscription() {
             try {
                 setLoading(true);
                 // Fetch user data
-                const { data: userData, error: userError } = await supabase
+                const { data: userData, error: userError }: { data: UserData | null, error: Error | null } = await supabase
                     .from('users')
                     .select('*')
                     .eq('email', session.email)
@@ -40,7 +40,7 @@ export function useSubscription() {
                 const { data: searchData, error: searchError } = await supabase
                     .from('fact_check_cache')
                     .select('*')
-                    .eq('user_id', userData.user_id)
+                    .eq('user_id', userData?.user_id)
                     .order('last_accessed_at', { ascending: false })
                     .limit(10);
 
@@ -50,7 +50,7 @@ export function useSubscription() {
                 const {data:subscriptionData,error:subscriptionError}=await supabase
                 .from('subscriptions')
                 .select('*')
-                .eq('user_id',userData.user_id)
+                .eq('user_id',userData?.user_id)
                 .single();
 
                 if(subscriptionData){

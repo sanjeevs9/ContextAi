@@ -42,7 +42,7 @@ async function handlePricingAction() {
     
     if (user.subscription_status === "free") {
       await handleCheckout({
-        price: Number(price) * 100,
+        price: Math.round(Number(price) * 100),
         model: model
       });
     } else {

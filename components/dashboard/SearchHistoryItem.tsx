@@ -37,7 +37,7 @@ export function SearchHistoryItem({ search }: SearchHistoryItemProps) {
       
       <p className="text-sm text-gray-400 mt-2">{search.explanation || search.detailed_explanation}</p>
       
-      {search.reference_sources.length > 0 && (
+      {search.reference_sources && Array.isArray(search.reference_sources) && (
         <div className="mt-3 flex items-start space-x-2">
           <Link className="h-4 w-4 text-[#00FF9D] mt-1" />
           <div className="flex-1">
@@ -45,9 +45,26 @@ export function SearchHistoryItem({ search }: SearchHistoryItemProps) {
             <ul className="space-y-1">
               {search.reference_sources.map((ref, idx) => {
                 console.log(ref);
-                // Extract URL from the reference if it contains one
-                const urlMatch = ref.match(/(https?:\/\/[^\s]+)/);
-                const url = urlMatch ? urlMatch[0] : null;
+                
+                // Handle different reference formats
+                let url = '';
+                let displayText = '';
+                
+                if (typeof ref === 'string') {
+                  // Handle plain string URLs
+                  url = ref;
+                  displayText = ref;
+                } else if (typeof ref === 'object' && ref !== null) {
+                  // Handle object format with link and source
+                  url = ref.link || '';
+                  displayText = ref.source || ref.link || '';
+                }
+
+                // If no valid URL was found, try to extract one from the display text
+                if (!url) {
+                  const urlMatch = displayText.match(/(https?:\/\/[^\s]+)/);
+                  url = urlMatch ? urlMatch[0] : '';
+                }
                 
                 return (
                   <li key={idx} className="text-sm text-gray-400 truncate">
@@ -58,10 +75,10 @@ export function SearchHistoryItem({ search }: SearchHistoryItemProps) {
                         rel="noopener noreferrer"
                         className="hover:text-[#00FF9D] transition-colors"
                       >
-                        {ref}
+                        {displayText}
                       </a>
                     ) : (
-                      <span>{ref}</span>
+                      <span>{displayText}</span>
                     )}
                   </li>
                 );

@@ -105,7 +105,7 @@ export async function POST(request: Request) {
       }
     }
     response.cache_id = cacheData?.cache_id;
-
+    console.log(response);
     return NextResponse.json(response);
   } catch (error) {
     console.error('Fact-check error:', error);
