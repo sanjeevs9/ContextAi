@@ -5,17 +5,16 @@ import { HowItWorks } from "@/components/HowItWorks";
 
 import { Testimonials } from "@/components/Testimonials";
 import { PricingSection } from "@/components/pricing/PricingSection";
-
+import { ContainerScroll } from "@/components/ui/container-scroll-animation";
 
 export default function Home() {
   return (
     <div className="min-h-screen">
       <Hero />
-      <div className="flex justify-center">
-
-      </div>
+     
+      <ContainerScroll titleComponent="How It Works" children={<HowItWorks />} />
       <Features />
-      <HowItWorks />
+      
       <PricingSection />
       <Testimonials />
     </div>

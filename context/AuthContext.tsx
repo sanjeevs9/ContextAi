@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       })
       if (authError) throw authError
-
+      console.log(data)
       // Only proceed with database insertion if we have a user
       if (data.user) {
         const { error: dbError } = await supabase
@@ -66,13 +66,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               updated_at: new Date().toISOString()
             }
           ])
-        
+        console.log("hiiii")
         if (dbError) throw dbError
         
-        // const {error}=await supabase.auth.signInWithPassword({
-        //   email,
-        //   password,
-        // })
+        const {data:signInData,error:signInError}=await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+        console.log(signInData)
         // if (error) throw error
         router.push('/verify-email') // Add this route to show verification instructions
       }
