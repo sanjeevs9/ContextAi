@@ -12,7 +12,9 @@ export default function Home() {
     <div className="min-h-screen">
       <Hero />
      
-      <ContainerScroll titleComponent="How It Works" children={<HowItWorks />} />
+      <ContainerScroll titleComponent="How It Works"  >
+        <HowItWorks />
+      </ContainerScroll>
       <Features />
       
       <PricingSection />
