@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const { feedback,cache_id } = body;
-
+console.log(feedback);
     if (!feedback) {
       return NextResponse.json({ error: 'Feedback is required' }, { status: 400 });
     }

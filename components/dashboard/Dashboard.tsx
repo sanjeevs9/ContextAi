@@ -13,8 +13,8 @@ export function Dashboard({ subscription, searchHistory }: DashboardProps) {
       <div className="container mx-auto py-8 px-4 md:w-3/4">
 
         <div className="flex flex-col gap-4 " >
-          <div className="flex flex-row justify-between w-full gap-4 ">
-            <div className="w-full md:w-1/2">
+          <div className="flex flex-row justify-between  gap-4 ">
+            <div className="w-11/12 md:w-1/2 ">
               <SubscriptionCard subscription={subscription} />
             </div>
               {/* <div className="w-1/2">

@@ -1,12 +1,11 @@
-import { OpenAI } from 'openai';
 import { createClient } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 import { FactCheckRequest, FactCheckResponse } from '@/utils/type';
 import { validateAuth } from '@/lib/auth-middleware';
+import getPerplexityCompletion from '@/lib/perplexity';
+import dotenv from 'dotenv';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+dotenv.config();
 const supabase = createClient();
 
 export async function POST(request: Request) {
@@ -14,9 +13,9 @@ export async function POST(request: Request) {
     // Verify authentication
     const session = await validateAuth();
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized',login:false }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', login: false }, { status: 401 });
     }
-    console.log(session.userData?.email)
+
     // Check subscription status and daily limit
     const { data: userData, error: userError } = await supabase
       .from('users')
@@ -29,11 +28,9 @@ export async function POST(request: Request) {
     }
    
     const isPremium = userData.subscription_status === 'premium';
-
-    // If free user and daily limit is 0, stop the process
     if (!isPremium && userData.daily_check_limit <= 0) {
       return NextResponse.json({ 
-        error: 'Daily limit reached. Please upgrade to premium for unlimited checks.' ,
+        error: 'Daily limit reached. Please upgrade to premium for unlimited checks.',
         buy: false,
         login: true
       }, { status: 403 });
@@ -42,58 +39,34 @@ export async function POST(request: Request) {
     const body: FactCheckRequest = await request.json();
     const { text, domain } = body;
 
-    // Perform all fact checking operations
-    const opinionCheck = await checkIfOpinion(text);
-    
-    let response: FactCheckResponse;
-    let confidenceScore = 0;
-    let resultType='false';
-    
-    if (opinionCheck.isOpinion) {
-      response = {
-        isOpinion: true,
-        factualScore: 0,
-        explanation: opinionCheck.explanation,
-      };
-      confidenceScore = 0;
-      resultType = 'false';
-    } else {
-      const factCheck = await performFactCheck(text);
-  
-      const sourceCredibility = domain ? 
-        await getSourceCredibility(domain) : undefined;
+    // Perform fact checking
+    const factCheck = await checkIfOpinion(text);
+    // const sourceCredibility = domain ? await getSourceCredibility(domain) : undefined;
 
-      response = {
-        ...factCheck,
-        isOpinion: false,
-        sourceCredibility,
-      };
-      confidenceScore = factCheck.factual_score;
-      resultType = 'true';
+    const response: FactCheckResponse = {
+      ...factCheck,
+      // sourceCredibility,
+    };
+
+    // Cache the results
+    const { data : cacheData, error: cacheError } = await supabase
+      .from('fact_check_cache')
+      .insert({
+        user_id: userData.user_id,
+        query_text: text,
+        confidence_score: factCheck.factualScore,
+        result_type: factCheck.isOpinion ? false : true,
+        explanation: factCheck.explanation,
+        reference_sources: factCheck.references || [],
+      })
+      .select()
+      .single();
+
+    if (cacheError) {
+      console.error('Error storing in cache:', cacheError);
     }
-    
-    const explanation = response.explanation || response.detailed_explanation;
-    console.log(userData);
-    // Update the cache with results
-    const { data: cacheData, error: cacheError } = await supabase
-    .from('fact_check_cache')
-    .insert({
-      user_id: userData.user_id,
-      query_text: text,
-      confidence_score: confidenceScore, // Will update this after fact check
-      result_type: resultType,      // Will update this after fact check
-      explanation: explanation,      // Will update this after fact check
-      reference_sources: response.references || [], // Will update this after fact check
-    })
-    .select()
-    .single();
 
- 
-  if (cacheError) {
-    console.error('Error storing in cache:', cacheError);
-  }
-
-    // Decrease daily limit for free users after successful fact check
+    // Decrease daily limit for free users
     if (!isPremium) {
       const { error: updateError } = await supabase
         .from('users')
@@ -104,9 +77,11 @@ export async function POST(request: Request) {
         console.error('Error updating daily limit:', updateError);
       }
     }
-    response.cache_id = cacheData?.cache_id;
-    console.log(response);
-    return NextResponse.json(response);
+  
+    return NextResponse.json({
+      ...response,
+      cache_id: cacheData.cache_id  
+    });
   } catch (error) {
     console.error('Fact-check error:', error);
     return NextResponse.json(
@@ -116,84 +91,55 @@ export async function POST(request: Request) {
   }
 }
 
-//check if the text is an opinion
 async function checkIfOpinion(text: string) {
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4-turbo-preview",
-    messages: [
+  const messages = [
+    {
+      role: "system",
+      content: `You are a fact-checking assistant. Analyze the given statement and return ONLY a JSON object in this exact format:
       {
-        role: "system",
-        content: `You are a fact-checking assistant that MUST return JSON in this exact format:
-        {
-          "isOpinion": boolean,
-          "factualScore": number,  // 0-100
-          "references": string[],
-          "explanation": string    // use this field name only
-        }
-
-        Example correct response:
-        {
-          "isOpinion": false,
-          "factualScore": 100,
-          "references": ["https://example.com/source"],
-          "explanation": "This is a factual statement because..."
-        }
-
-        CRITICAL REQUIREMENTS:
-        - Field names must be exactly as shown above
-        - DO NOT use "factual_score" or "detailed_explanation"
-        - Use "factualScore" and "explanation" exactly as written
-        - No additional fields allowed
-        - No variant field names allowed`
-      },
-      {
-        role: "user",
-        content: text
+        "isOpinion": boolean,
+        "factualScore": number (0-100),
+        "references": ["url1", "url2"],
+        "explanation": "minimum 100 words explanation"
       }
-    ],
-    response_format: { type: "json_object" }
-  });
 
-  return JSON.parse(completion.choices[0].message.content!);
-}
+      Rules:
+      1. isOpinion: true if statement is subjective, false if objective
+      2. factualScore: 0-100 indicating how factual the statement is
+      3. references: array of credible source URLs
+      4. explanation: detailed analysis in minimum 100 words
+      
+      Return ONLY the JSON object, no additional text or markdown.`
+    },
+    {
+      role: "user",
+      content: text
+    }
+  ];
 
-async function performFactCheck(text: string) {
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4-turbo-preview",
-    messages: [
-      {
-        role: "system",
-        content: `Fact check the given statement and provide:
-          - A factual score (0-100)
-          - A detailed explanation
-          - References if possible
-          Respond in JSON format.`
-      },
-      {
-        role: "user",
-        content: text
-      }
-    ],
-    response_format: { type: "json_object" }
-  });
-
-  return JSON.parse(completion.choices[0].message.content!);
-}
-
-async function getSourceCredibility(domain: string) {
-  // Check domain credibility in Supabase
-  const { data, error } = await supabase
-    .from('domain_credibility')
-    .select('score, label')
-    .eq('domain', domain)
-    .single();
-
-  if (error || !data) {
-    return {
-      score: 0,
-      label: 'Unknown' as const
-    };
+  const completion = await getPerplexityCompletion(messages);
+  console.log(completion.choices[0].message.content);
+  try {
+    return JSON.parse(completion.choices[0].message.content);
+  } catch (error) {
+    console.error('Error parsing JSON response:', error);
+    throw new Error('Invalid response format from API');
   }
-
-  return data;
 }
+
+// async function getSourceCredibility(domain: string) {
+//   const { data, error } = await supabase
+//     .from('domain_credibility')
+//     .select('score, label')
+//     .eq('domain', domain)
+//     .single();
+
+//   if (error || !data) {
+//     return {
+//       score: 0,
+//       label: 'Unknown' as const
+//     };
+//   }
+
+//   return data;
+// }
