@@ -100,10 +100,13 @@ async function checkIfOpinion(text: string) {
         "isOpinion": boolean,
         "factualScore": number (0-100),
         "references": ["url1", "url2"],
-        "explanation": "minimum 100 words explanation"
+        "explanation": "minimum 100 words explanation",
       }
 
-      Rules:
+      Can you please provide the latest references for the given statement and return the urls in the references array.
+      If it is an opinion please make isOpinion true and factualScore 0.
+      
+
       1. isOpinion: true if statement is subjective, false if objective
       2. factualScore: 0-100 indicating how factual the statement is
       3. references: array of credible source URLs
