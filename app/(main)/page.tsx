@@ -1,3 +1,4 @@
+"use client"
 
 import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
@@ -6,12 +7,26 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { Testimonials } from "@/components/Testimonials";
 import { PricingSection } from "@/components/pricing/PricingSection";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
+import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
+import {Toaster, toast } from 'sonner';
 
 export default function Home() {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // toast.success('Payment successful! Welcome aboard!');
+    // Check for successful Stripe session
+    const sessionId = searchParams.get('session_id');
+    if (sessionId) {
+      toast('Payment successful! Welcome aboard!');
+    }
+  }, [searchParams]);
+
   return (
     <div className="min-h-screen">
       <Hero />
-     
+    
       <ContainerScroll titleComponent="How It Works"  >
         <HowItWorks />
       </ContainerScroll>
