@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
       headers: {
         'Access-Control-Allow-Origin': 'https://c221-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
-        'Access-Control-Allow-Headers': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
         'Access-Control-Allow-Credentials': 'true',
       },
     })
@@ -49,7 +49,7 @@ export async function middleware(request: NextRequest) {
   // Add CORS headers to all responses
   response.headers.set('Access-Control-Allow-Origin', 'https://c221-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app')
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-  response.headers.set('Access-Control-Allow-Headers', '*')
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
   response.headers.set('Access-Control-Allow-Credentials', 'true')
 
   return response
