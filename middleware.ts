@@ -5,8 +5,9 @@ import type { NextRequest } from 'next/server'
 const allowedOrigins = [
   'http://localhost:5173',  // Local development frontend
   'http://localhost:3000',  // Local development backend
-  'https://context-ai-ochre.vercel.app', // Your deployed backend
-  // Add your production frontend URL when you deploy it
+  'https://context-ai-ochre.vercel.app',
+  'https://fd6a-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app', // Your ngrok URL
+  // Add any other origins you need
 ];
 
 export async function middleware(request: NextRequest) {
@@ -15,13 +16,18 @@ export async function middleware(request: NextRequest) {
   // For development and testing, log the origin
   console.log('Request origin:', origin);
 
+  // Check if the origin is allowed
+  const isAllowedOrigin = allowedOrigins.includes(origin);
+  const corsOrigin = isAllowedOrigin ? origin : allowedOrigins[0];
+
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
       headers: {
-        'Access-Control-Allow-Origin': origin,  // Use actual origin instead of '*'
+        'Access-Control-Allow-Origin': origin,
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version',
         'Access-Control-Allow-Credentials': 'true',
+        'Vary': 'Origin',
       },
     });
   }
@@ -58,24 +64,18 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next()
 
   // Set CORS headers for all responses
-  response.headers.set('Access-Control-Allow-Origin', origin);  // Use actual origin instead of '*'
+  response.headers.set('Access-Control-Allow-Origin', origin);
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version');
   response.headers.set('Access-Control-Allow-Credentials', 'true');
+  response.headers.set('Vary', 'Origin');
 
   return response
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     '/api/:path*',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }
