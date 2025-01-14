@@ -2,55 +2,69 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server'
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://context-ai-ochre.vercel.app',
-  'http://localhost:5174',
-  'https://fd6a-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app'
-];
-
 export async function middleware(request: NextRequest) {
-  const origin = request.headers.get('origin');
-  
-  console.log('Middleware executing for path:', request.nextUrl.pathname);
-  console.log('Request origin:', origin);
-  console.log('Request method:', request.method);
-
-  // If no origin, use default response
-  if (!origin) {
-    const response = NextResponse.next();
-    return response;
-  }
-
-  // Handle preflight
+  // Handle OPTIONS request for CORS preflight
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
-      status: 200,
       headers: {
-        'Access-Control-Allow-Origin': origin,
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+        'Access-Control-Allow-Origin': 'https://c221-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
+        'Access-Control-Allow-Headers': '*',
         'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Max-Age': '86400',
       },
-    });
+    })
   }
 
-  const response = NextResponse.next();
+  // Create a Supabase client configured to use cookies
+  const supabase = createMiddlewareClient({ req: request, res: NextResponse.next() });
   
-  // Set CORS headers
-  response.headers.set('Access-Control-Allow-Origin', origin);
-  response.headers.set('Access-Control-Allow-Credentials', 'true');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  response.headers.set('Access-Control-Max-Age', '86400');
-  
+  // Refresh session if expired - required for Server Components
+  await supabase.auth.getSession();
 
-  return response;
+  // Get the pathname of the request
+  const path = request.nextUrl.pathname;
+
+  // Get the user's session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  // Define public routes that don't require authentication
+  const publicRoutes = ['/', '/login', '/signup', '/forgot-password','/api/webhook'];
+  
+  // If the user is not logged in and trying to access a protected route
+  if (!session && !publicRoutes.includes(path)) {
+    const redirectUrl = new URL('/login', request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // If the user is logged in and trying to access login/signup pages
+  if (session && publicRoutes.includes(path) && path !== '/') {
+    const redirectUrl = new URL('/dashboard', request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  const response = NextResponse.next()
+
+  // Add CORS headers to all responses
+  response.headers.set('Access-Control-Allow-Origin', 'https://c221-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app')
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+  response.headers.set('Access-Control-Allow-Headers', '*')
+  response.headers.set('Access-Control-Allow-Credentials', 'true')
+
+  return response
 }
 
 export const config = {
   matcher: [
-    '/api/:path*',  // Match all API routes
-  ]
-};
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/api/:path*',
+  ],
+}
