@@ -18,13 +18,15 @@ export async function middleware(request: NextRequest) {
 
   // Check if the origin is allowed
   const isAllowedOrigin = allowedOrigins.includes(origin);
+  console.log('isAllowedOrigin:', isAllowedOrigin);
   const corsOrigin = isAllowedOrigin ? origin : allowedOrigins[0];
+  console.log('corsOrigin:', corsOrigin);
 
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
       headers: {
         'Access-Control-Allow-Origin': origin,
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD ',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version',
         'Access-Control-Allow-Credentials': 'true',
         'Vary': 'Origin',
