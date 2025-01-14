@@ -12,9 +12,12 @@ export async function POST(request: Request) {
   try {
     // Verify authentication
     const session = await validateAuth();
+    console.log('session', session);
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized', login: false }, { status: 401 });
     }
+
+    console.log('session', session);
 
     // Check subscription status and daily limit
     const { data: userData, error: userError } = await supabase
