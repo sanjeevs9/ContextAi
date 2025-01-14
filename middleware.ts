@@ -11,12 +11,10 @@ export async function middleware(request: NextRequest) {
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
       headers: {
-        'Access-Control-Allow-Origin': 'https://c221-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app',
+        'Access-Control-Allow-Origin': 'https://df1b-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
         'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Max-Age': '7200',
-        'Set-Cookie': 'sb-access-token=; SameSite=None; Secure; Path=/',
       },
     })
   }
@@ -53,12 +51,16 @@ export async function middleware(request: NextRequest) {
 
   const response = NextResponse.next()
 
-  // Add CORS headers to all responses
-  response.headers.set('Access-Control-Allow-Origin', 'https://c221-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app')
+  // Add CORS headers with more specific cookie settings
+  response.headers.set('Access-Control-Allow-Origin', 'https://df1b-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app')
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
   response.headers.set('Access-Control-Allow-Credentials', 'true')
-  response.headers.set('Set-Cookie', 'sb-access-token=; SameSite=None; Secure; Path=/')
+  
+  // Add specific cookie settings
+  response.headers.set('Set-Cookie', 'sb-access-token=...; SameSite=None; Secure; Path=/; HttpOnly')
+  response.headers.set('Set-Cookie', 'sb-refresh-token=...; SameSite=None; Secure; Path=/; HttpOnly')
+
   return response
 }
 
