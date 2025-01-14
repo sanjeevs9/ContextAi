@@ -3,7 +3,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  // Handle OPTIONS request for CORS preflight
+  // Handle OPTIONS request for CORS 
+  const origin = request.headers.get('origin');
+  console.log('Middleware executing for path:', request.nextUrl.pathname);
+  console.log('Request origin:', origin);
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
       headers: {
@@ -14,6 +17,7 @@ export async function middleware(request: NextRequest) {
       },
     })
   }
+
 
   // Create a Supabase client configured to use cookies
   const supabase = createMiddlewareClient({ req: request, res: NextResponse.next() });
