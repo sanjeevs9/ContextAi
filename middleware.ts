@@ -2,17 +2,28 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server'
 
+const allowedOrigins = [
+  'http://localhost:5173',  // Local development frontend
+  'http://localhost:3000',  // Local development backend
+  'https://context-ai-ochre.vercel.app', // Your deployed backend
+  // Add your production frontend URL when you deploy it
+];
+
 export async function middleware(request: NextRequest) {
-  // Handle OPTIONS request for CORS preflight
+  const origin = request.headers.get('origin') || '';
+  
+  // For development and testing, log the origin
+  console.log('Request origin:', origin);
+
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
       headers: {
-        'Access-Control-Allow-Origin': 'http://localhost:5173',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Allow-Origin': origin,  // Use actual origin instead of '*'
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version',
         'Access-Control-Allow-Credentials': 'true',
       },
-    })
+    });
   }
 
   // Create a Supabase client configured to use cookies
@@ -46,11 +57,11 @@ export async function middleware(request: NextRequest) {
 
   const response = NextResponse.next()
 
-  // Add CORS headers to all responses
-  response.headers.set('Access-Control-Allow-Origin', 'http://localhost:5173')
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-  response.headers.set('Access-Control-Allow-Credentials', 'true')
+  // Set CORS headers for all responses
+  response.headers.set('Access-Control-Allow-Origin', origin);  // Use actual origin instead of '*'
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Date, X-Api-Version');
+  response.headers.set('Access-Control-Allow-Credentials', 'true');
 
   return response
 }
