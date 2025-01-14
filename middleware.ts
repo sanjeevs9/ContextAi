@@ -56,10 +56,6 @@ export async function middleware(request: NextRequest) {
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
   response.headers.set('Access-Control-Allow-Credentials', 'true')
-  
-  // Add specific cookie settings
-  response.headers.set('Set-Cookie', 'sb-access-token=...; SameSite=None; Secure; Path=/; HttpOnly')
-  response.headers.set('Set-Cookie', 'sb-refresh-token=...; SameSite=None; Secure; Path=/; HttpOnly')
 
   return response
 }
