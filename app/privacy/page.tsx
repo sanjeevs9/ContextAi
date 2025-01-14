@@ -10,8 +10,22 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Shield, Clock, User, Database, Globe, Mail, AlertCircle } from 'lucide-react';
 
+type ContentType = string | string[];
+
+type Subsection = {
+  subtitle: string;
+  content: ContentType;
+};
+
+type Section = {
+  icon: React.ReactNode;
+  title: string;
+  content?: ContentType;
+  subsections?: Subsection[];
+};
+
 const PrivacyPolicyPage = () => {
-  const sections = [
+  const sections: Section[] = [
     {
       icon: <Shield className="w-5 h-5" />,
       title: "Introduction",
@@ -87,7 +101,7 @@ const PrivacyPolicyPage = () => {
     }
   ];
 
-  const renderContent = (content: any) => {
+  const renderContent = (content: ContentType) => {
     if (Array.isArray(content)) {
       return (
         <ul className="list-disc pl-6 space-y-2">
@@ -131,7 +145,7 @@ const PrivacyPolicyPage = () => {
                       ))}
                     </div>
                   ) : (
-                    renderContent(section.content)
+                    section.content ? renderContent(section.content) : null
                   )}
                   
                   {index < sections.length - 1 && (
