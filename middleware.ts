@@ -7,6 +7,7 @@ export async function middleware(request: NextRequest) {
   const origin = request.headers.get('origin');
   console.log('Middleware executing for path:', request.nextUrl.pathname);
   console.log('Request origin:', origin);
+  
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
       headers: {
@@ -14,6 +15,8 @@ export async function middleware(request: NextRequest) {
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
         'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Max-Age': '7200',
+        'Set-Cookie': 'sb-access-token=; SameSite=None; Secure; Path=/',
       },
     })
   }
@@ -55,7 +58,7 @@ export async function middleware(request: NextRequest) {
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
   response.headers.set('Access-Control-Allow-Credentials', 'true')
-
+  response.headers.set('Set-Cookie', 'sb-access-token=; SameSite=None; Secure; Path=/')
   return response
 }
 
