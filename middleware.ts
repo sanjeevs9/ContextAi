@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
       headers: {
-        'Access-Control-Allow-Origin': 'https://df1b-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app',
+        'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, DELETE',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
         'Access-Control-Allow-Credentials': 'true',
@@ -52,7 +52,7 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next()
 
   // Add CORS headers with more specific cookie settings
-  response.headers.set('Access-Control-Allow-Origin', 'https://df1b-2401-4900-1cab-d405-981-11ab-c754-a555.ngrok-free.app')
+  response.headers.set('Access-Control-Allow-Origin', '*')
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
   response.headers.set('Access-Control-Allow-Credentials', 'true')
