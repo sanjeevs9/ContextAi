@@ -46,10 +46,10 @@ export async function middleware(request: NextRequest) {
   // Check route access based on session
   const path = request.nextUrl.pathname;
 
-  if (!session && !publicRoutes.includes(path)) {
-    const redirectUrl = new URL('/login', request.url);
-    return NextResponse.redirect(redirectUrl);
-  }
+  // if (!session && !publicRoutes.includes(path)) {
+  //   const redirectUrl = new URL('/login', request.url);
+  //   return NextResponse.redirect(redirectUrl);
+  // }
 
   if (session && publicRoutes.includes(path) && path !== '/') {
     const redirectUrl = new URL('/dashboard', request.url);
