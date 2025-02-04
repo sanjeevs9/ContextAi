@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
     'http://localhost:5174',  // Your frontend development URL
     'https://your-production-domain.com',  // Your production frontend URL
     'chrome-extension://your-extension-id',
-    "https://f16e-2401-4900-1f3b-a07-da3-fdae-3e27-4fe5.ngrok-free.app"  // Your Chrome extension
+    "https://83d6-2401-4900-1f3b-a07-281c-218a-1c56-ebb2.ngrok-free.app"  // Your Chrome extension
   ];
 
   // Check if the origin is allowed

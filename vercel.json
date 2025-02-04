@@ -4,7 +4,7 @@
       "source": "/api/(.*)",
       "headers": [
         { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        { "key": "Access-Control-Allow-Origin", "value": "https://f16e-2401-4900-1f3b-a07-da3-fdae-3e27-4fe5.ngrok-free.app" },
+        { "key": "Access-Control-Allow-Origin", "value": "https://83d6-2401-4900-1f3b-a07-281c-218a-1c56-ebb2.ngrok-free.app" },
         { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
       ]
