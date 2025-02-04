@@ -9,7 +9,8 @@ export async function middleware(request: NextRequest) {
   const allowedOrigins = [
     'http://localhost:5174',  // Your frontend development URL
     'https://your-production-domain.com',  // Your production frontend URL
-    'chrome-extension://your-extension-id'  // Your Chrome extension
+    'chrome-extension://your-extension-id',
+    "https://f16e-2401-4900-1f3b-a07-da3-fdae-3e27-4fe5.ngrok-free.app"  // Your Chrome extension
   ];
 
   // Check if the origin is allowed
