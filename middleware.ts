@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   const origin = request.headers.get('origin') || '';
-  
+
   // Define allowed origins
   const allowedOrigins = [
     'http://localhost:5174',  // Your frontend development URL
@@ -46,10 +46,10 @@ export async function middleware(request: NextRequest) {
   // Check route access based on session
   const path = request.nextUrl.pathname;
 
-  // if (!session && !publicRoutes.includes(path)) {
-  //   const redirectUrl = new URL('/login', request.url);
-  //   return NextResponse.redirect(redirectUrl);
-  // }
+  if (!session && !publicRoutes.includes(path)) {
+    const redirectUrl = new URL('/login', request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
 
   if (session && publicRoutes.includes(path) && path !== '/') {
     const redirectUrl = new URL('/dashboard', request.url);
@@ -80,5 +80,5 @@ export const config = {
      */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     '/api/:path*',
-  ],
+  ]
 }
