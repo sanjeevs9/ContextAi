@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               updated_at: new Date().toISOString()
             }
           ])
-        console.log("hiiii")
+        console.log("signup")
         if (dbError) throw dbError
         
         const {data:signInData,error:signInError}=await supabase.auth.signInWithPassword({
