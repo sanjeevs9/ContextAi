@@ -5,13 +5,19 @@ import type { NextRequest } from 'next/server';
 export async function middleware(request: NextRequest) {
   const origin = request.headers.get('origin') || '';
   
+  // Define allowed origins
+  const allowedOrigins = [
+    'http://localhost:5174',  // Your frontend development URL
+    'https://your-production-domain.com'  // Your production frontend URL
+  ];
+
   // Handle preflight requests (OPTIONS)
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
       headers: {
-        'Access-Control-Allow-Origin': '*',  // Allow all origins for preflight
+        'Access-Control-Allow-Origin': allowedOrigins.includes(origin) ? origin : '',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers': '*',  // Allow all headers
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Max-Age': '86400',
       },
@@ -50,11 +56,10 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
   // Set CORS headers for all responses
-  // In production, you might want to be more specific about allowed origins
-  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Origin', allowedOrigins.includes(origin) ? origin : '');
   response.headers.set('Access-Control-Allow-Credentials', 'true');
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', '*');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   return response;
 }
