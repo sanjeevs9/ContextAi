@@ -8,14 +8,18 @@ export async function middleware(request: NextRequest) {
   // Define allowed origins
   const allowedOrigins = [
     'http://localhost:5174',  // Your frontend development URL
-    'https://your-production-domain.com'  // Your production frontend URL
+    'https://your-production-domain.com',  // Your production frontend URL
+    'chrome-extension://your-extension-id'  // Your Chrome extension
   ];
+
+  // Handle extension requests (chrome-extension://)
+  const isExtensionRequest = origin.startsWith('chrome-extension://');
 
   // Handle preflight requests (OPTIONS)
   if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
       headers: {
-        'Access-Control-Allow-Origin': allowedOrigins.includes(origin) ? origin : '',
+        'Access-Control-Allow-Origin': isExtensionRequest || allowedOrigins.includes(origin) ? origin : '',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Allow-Credentials': 'true',
@@ -56,7 +60,7 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
   // Set CORS headers for all responses
-  response.headers.set('Access-Control-Allow-Origin', allowedOrigins.includes(origin) ? origin : '');
+  response.headers.set('Access-Control-Allow-Origin', isExtensionRequest || allowedOrigins.includes(origin) ? origin : '');
   response.headers.set('Access-Control-Allow-Credentials', 'true');
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
