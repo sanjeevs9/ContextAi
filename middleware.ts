@@ -45,7 +45,8 @@ export async function middleware(request: NextRequest) {
 
   // Check route access based on session
   const path = request.nextUrl.pathname;
-
+console.log("path", path)
+console.log("session", session)
   if (!session && !publicRoutes.includes(path)) {
     // Prevent redirect for POST requests
     if (request.method === 'POST') {
