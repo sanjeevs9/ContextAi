@@ -48,6 +48,7 @@ export async function middleware(request: NextRequest) {
 
   if (!session && !publicRoutes.includes(path)) {
     const redirectUrl = new URL('/login', request.url);
+    console.log("redirectUrl", redirectUrl)
     return NextResponse.redirect(redirectUrl);
   }
 
