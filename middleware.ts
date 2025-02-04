@@ -2,29 +2,18 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000','http://localhost:5174']; // Add all your allowed origins
-
 export async function middleware(request: NextRequest) {
-  const origin = request.headers.get('origin');
+  const origin = request.headers.get('origin') || '';
   
-  // Validate origin
-  const isValidOrigin = origin && allowedOrigins.includes(origin);
-  const corsOrigin = isValidOrigin ? origin : allowedOrigins[0];
-
-  console.log('Middleware executing for path:', request.nextUrl.pathname);
-  console.log('Request origin:', origin);
-  console.log('Request method:', request.method);
-
-  // Handle OPTIONS request for CORS
-  if (request.method === 'OPTIONS' || request.method === 'POST') {
+  // Handle preflight requests (OPTIONS)
+  if (request.method === 'OPTIONS') {
     return new NextResponse(null, {
       headers: {
-        'Access-Control-Allow-Origin': corsOrigin,
+        'Access-Control-Allow-Origin': origin,
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
         'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Max-Age': '86400', // 24 hours cache for preflight requests
-        
+        'Access-Control-Max-Age': '86400',
       },
     });
   }
@@ -56,17 +45,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  console.log("hiii")
+
   const response = NextResponse.next();
 
   // Set CORS headers for all responses
-  response.headers.set('Access-Control-Allow-Origin', corsOrigin);
+  response.headers.set('Access-Control-Allow-Origin', origin);
   response.headers.set('Access-Control-Allow-Credentials', 'true');
-  
-  // Only set these headers for non-OPTIONS requests
-  if (request.method !== 'OPTIONS' && request.method !== 'POST') {
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  }
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
 
   return response;
 }

@@ -9,6 +9,7 @@ dotenv.config();
 const supabase = createClient();
 
 export async function POST(request: Request) {
+  console.log("post")
   try {
     // Verify authentication
     const session = await validateAuth();
