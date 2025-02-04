@@ -47,8 +47,14 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   if (!session && !publicRoutes.includes(path)) {
+    // Prevent redirect for POST requests
+    if (request.method === 'POST') {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
     const redirectUrl = new URL('/login', request.url);
-    console.log("redirectUrl", redirectUrl)
     return NextResponse.redirect(redirectUrl);
   }
 
