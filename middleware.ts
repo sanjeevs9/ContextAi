@@ -29,40 +29,40 @@ export async function middleware(request: NextRequest) {
     });
   }
 
-  // Create a Supabase client configured to use cookies
-  const supabase = createMiddlewareClient({ req: request, res: NextResponse.next() });
+//   // Create a Supabase client configured to use cookies
+//   const supabase = createMiddlewareClient({ req: request, res: NextResponse.next() });
 
-  // Refresh session if expired
-  await supabase.auth.getSession();
+//   // Refresh session if expired
+//   await supabase.auth.getSession();
 
-  // Define public routes that don't require authentication
-  const publicRoutes = ['/', '/login', '/signup', '/forgot-password', '/api/webhook', '/privacy'];
+//   // Define public routes that don't require authentication
+//   const publicRoutes = ['/', '/login', '/signup', '/forgot-password', '/api/webhook', '/privacy'];
 
-  // Get the user's session
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+//   // Get the user's session
+//   const {
+//     data: { session },
+//   } = await supabase.auth.getSession();
 
-  // Check route access based on session
-  const path = request.nextUrl.pathname;
-console.log("path", path)
-console.log("session", session)
-  if (!session && !publicRoutes.includes(path)) {
-    // Prevent redirect for POST requests
-    if (request.method === 'POST') {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-    const redirectUrl = new URL('/login', request.url);
-    return NextResponse.redirect(redirectUrl);
-  }
+//   // Check route access based on session
+//   const path = request.nextUrl.pathname;
+// console.log("path", path)
+// console.log("session", session)
+//   if (!session && !publicRoutes.includes(path)) {
+//     // Prevent redirect for POST requests
+//     if (request.method === 'POST') {
+//       return NextResponse.json(
+//         { error: 'Authentication required' },
+//         { status: 401 }
+//       );
+//     }
+//     const redirectUrl = new URL('/login', request.url);
+//     return NextResponse.redirect(redirectUrl);
+//   }
 
-  if (session && publicRoutes.includes(path) && path !== '/') {
-    const redirectUrl = new URL('/dashboard', request.url);
-    return NextResponse.redirect(redirectUrl);
-  }
+//   if (session && publicRoutes.includes(path) && path !== '/') {
+//     const redirectUrl = new URL('/dashboard', request.url);
+//     return NextResponse.redirect(redirectUrl);
+//   }
 
   console.log("hiii")
 
