@@ -4,6 +4,7 @@ import { FactCheckRequest, FactCheckResponse } from '@/utils/type';
 import { validateAuth } from '@/lib/auth-middleware';
 import getPerplexityCompletion from '@/lib/perplexity';
 import dotenv from 'dotenv';
+import { error } from 'console';
 
 dotenv.config();
 const supabase = createClient();
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
     const session = await validateAuth();
     console.log('session', session);
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized', login: false }, { status: 401 });
+      return NextResponse.json({ error: error, login: false }, { status: 401 });
     }
 
     console.log('session', session);
