@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/(.*)",
       "headers": [
         { "key": "Access-Control-Allow-Credentials", "value": "true" },
         { "key": "Access-Control-Allow-Origin", "value": "https://83d6-2401-4900-1f3b-a07-281c-218a-1c56-ebb2.ngrok-free.app" },
