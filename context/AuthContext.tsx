@@ -40,17 +40,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (email: string, password: string) => {
     try {
-      // Sign up with email verification (recommended for security)
       const { error: authError, data } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
-        }
       })
       if (authError) throw authError
       console.log(data)
-      // Only proceed with database insertion if we have a user
+      
       if (data.user) {
         const { error: dbError } = await supabase
           .from('users')
@@ -66,16 +62,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               updated_at: new Date().toISOString()
             }
           ])
-        console.log("signup")
         if (dbError) throw dbError
         
-        const {data:signInData,error:signInError}=await supabase.auth.signInWithPassword({
+        const {data: signInData, error: signInError} = await supabase.auth.signInWithPassword({
           email,
           password,
         })
         console.log(signInData)
-        // if (error) throw error
-        router.push('/verify-email') // Add this route to show verification instructions
+        router.push('/') // Changed from '/verify-email' to '/'
       }
     } catch (error) {
       throw error
