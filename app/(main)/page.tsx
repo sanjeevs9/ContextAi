@@ -13,6 +13,7 @@ import { Toaster, toast } from 'sonner';
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { SparklesIcon, ShieldCheckIcon, ZapIcon } from "lucide-react"
+import "../globals.css"
 
 function HomeContent() {
   const searchParams = useSearchParams();
